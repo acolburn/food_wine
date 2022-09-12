@@ -4,9 +4,11 @@
 # importing pandas package
 import pandas as pd
 
+
 # output will display all the rows and cols in the dataframe/spreadsheet
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', 500)
 
 # making data frame from csv file
 data = pd.read_csv("food_wine_pairing.csv", encoding='unicode_escape')
@@ -61,7 +63,8 @@ if int(i) < len(choices_list):
     print(f"You selected: {selected_data.name}\n")
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
+
 
 
 # Ask about preparation
@@ -84,7 +87,8 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
+
 
 
 
@@ -107,7 +111,7 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
 
 
 # Ask about vegetables
@@ -129,7 +133,7 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
 
 
 # Ask about seasoning
@@ -151,7 +155,7 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
 
 # Ask about starch
 print("Are starches playing a role in your meal?")
@@ -172,7 +176,7 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
 
 # Ask about sweets
 print("Finally, sweets:")
@@ -193,10 +197,15 @@ if int(i) < len(choices_list):
         selected_data = new_data
 else:
     print('OK, moving on.\n')
-print("---------------------------------------------------------\n")
+print("\n---------------------------------------------------------\n")
 
-print("Here is the selected data:")
-print(selected_data)
+print("Here is what you selected:")
+# print(selected_data['name']) //this line includes type and int64 info that's unneeded
+sel = selected_data['name'].values
+for item in sel:
+    print(item)
+
+print("\n---------------------------------------------------------\n")
 
 # Let's start parsing the selected_data dataframe:
 # select cols that contain 2's everywhere
@@ -226,20 +235,30 @@ if len(out2) > 0:
         print(item)
     print("\nHere is the full list of pairings to consider:")
 elif len(out) > 0:
-    print("Here are some pairing suggestions for your meal:")
+    print("Here are some pairing suggestions for your meal (ranked from best to worst):")
 else:
     print("Unfortunately, I did not find great pairings for your meal.")
 
-for item in out:
-    item = item.replace("_", ' ')
-    print(item)
+# for item in out:
+#     item = item.replace("_", ' ')
+#     print(item)
+
+# replace _ with spaces before displaying
+selected_data.columns = [column.replace("_", " ") for column in selected_data.columns]
+# .sum() adds the values in each column
+# .sort_values(ascending=False) sorts the values (duh) and displays from highest to lowest
+display = selected_data.sum(numeric_only=True).sort_values(ascending=False)
+# without .to_string() the info is displayed with an added Type:int64 attribute at the end
+# see https://stackoverflow.com/questions/53025207/how-do-i-remove-name-and-dtype-from-pandas-output
+print(display.to_string())
 
 if len(out0) > 0:
-    print("\nFor this meal, stay away from these wines:")
+    print("\nIn other words, for this meal, stay away from these wines:")
     for item in out0:
         item=item.replace("_", ' ')
         print(item)
 
-print("DONE!")
+print("\nDONE!")
+
 
 

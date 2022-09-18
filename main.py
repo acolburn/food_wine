@@ -1,6 +1,22 @@
 # Original pairing chart at https://tinyurl.com/ydx4twpy
 # data.query() info at https://www.geeksforgeeks.org/python-filtering-data-with-pandas-query-method/
 
+# how to select first 3 rows
+# out = data.head(3)
+
+# filtering with query method
+# if user selects pairing with meat:
+# out = data.loc[data['category'] == 'meat']
+
+# user selects pairing with red meat
+# filtered_data = data.loc[data['name'] == 'red meat']
+
+# how to select rows that contain value 2 in any column
+# out = out[out.isin([2]).any(axis=1)]
+
+# display only name and examples columns
+# print(out[['name', 'examples']])
+
 # importing pandas package
 import pandas as pd
 
@@ -14,241 +30,70 @@ data = pd.read_csv("food_wine_pairing.csv", encoding='unicode_escape')
 # replacing blank spaces with '_'
 data.columns = [column.replace(" ", "_") for column in data.columns]
 
-# how to select first 3 rows
-# out = data.head(3)
-
-# filtering with query method
-# if user selects pairing with meat:
-# out = data.loc[data['category'] == 'meat']
-
-
-# user selects pairing with red meat
-# filtered_data = data.loc[data['name'] == 'red meat']
-
-# if user then also selects pairing with grilled,
-# this is how to put them together into a single dataframe
-# filtered_data2 = data.loc[data['name'] == 'grilled']
-# combined_data = pd.concat([filtered_data, filtered_data2])
-# this also works:
-# combined_data = pd.concat([filtered_data, data.loc[data['name'] == 'grilled']])
-# here's hot to then add in green vegetables
-# filtered_data3 = data.loc[data['name'] == 'green vegetables']
-# combined_data = pd.concat([combined_data, filtered_data3])
-
-
-# how to select rows that contain value 2 in any column
-# out = out[out.isin([2]).any(axis=1)]
-
-# out = out.loc[data['bold_red'] >= 1]
-
-
-# display only name and examples columns
-# print(out[['name', 'examples']])
-
+# Introduction text
 print("Let's pair! Follow the prompts to find wines to pair with your meal.\n")
-# Ask about meats
-print("Which, if any, of these meats are part of your meal?")
-choices = data.loc[data['category'] == 'meat']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
 
-if int(i) < len(choices_list):
-    selected_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {selected_data.name}\n")
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+
+def input_choices(prompt, category):
+    # global selected_data
+    print(prompt)
+    _choices = data.loc[data['category'] == category]
+    _choices_list = _choices.name.to_list()
+    _examples_list = _choices.examples.to_list()
+    for item in _choices_list:
+        # print(f"{choices_list.index(item)}\t{item}")
+        s = str(_choices_list.index(item)) + '\t' + item
+        t = _examples_list[_choices_list.index(item)]
+        # if there's an example, print it, otherwise ... don't
+        # below is the preferred way to do what you want to do
+        # cells without values still evaluated as NaN (like null),
+        # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+        if pd.isnull(t) or t.isspace():
+            print(s)
+        else:
+            print(s + f' (e.g., {t})')
+    print(f"{len(_choices_list)}\tnone of the above/skip this category")
+    i = input("Your selection: ")
+    if int(i) < len(_choices_list):
+        _new_data = data.loc[data['name'] == _choices_list[int(i)]]
+        print(f"You selected: {_new_data.name}")
+        try:
+            _selected_data = pd.concat([selected_data, _new_data])
+        except NameError:  # Get this error if there's nothing in the global selected_data
+            _selected_data = _new_data
+    else:
+        print('OK, moving on.\n')
+        try:
+            _selected_data = selected_data
+        except NameError:  # Get this error if selected_data is undefined, i.e., choose 'none' for first category
+            return None
+    print("\n---------------------------------------------------------\n")
+    return _selected_data
+
+
+# Ask about meats
+selected_data = input_choices("Which, if any, of these meats are part of your meal?", 'meat')
 
 # Ask about preparation
-print("Now let's consider how the meat, or main dish in the meal, will be prepared.")
-print("Which, if any of these preparation methods, are important to your meal:")
-choices = data.loc[data['category'] == 'preparation']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices(
+    "Now let's consider how the meat, or main dish in the meal, will be prepared.\nWhich, if any of these preparation methods, are important to your meal:",
+    "preparation")
 
 # Ask about dairy
-print("Will your meal include dairy products?")
-choices = data.loc[data['category'] == 'dairy']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices("Will your meal include dairy products?", 'dairy')
 
 # Ask about vegetables
-print("Now let us consider those healthy vegetables!")
-choices = data.loc[data['category'] == 'vegetable']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices("Now let us consider those healthy vegetables!", 'vegetable')
 
 # Ask about seasoning
-print("Seasoning is important for wine pairing. Are any of these part of your meal?")
-choices = data.loc[data['category'] == 'seasoning']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices("Seasoning is important for wine pairing. Are any of these part of your meal?",
+                              'seasoning')
 
 # Ask about starch
-print("Are starches playing a role in your meal?")
-choices = data.loc[data['category'] == 'starch']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices("Are starches playing a role in your meal?", 'starch')
 
 # Ask about sweets
-print("Finally, sweets:")
-choices = data.loc[data['category'] == 'sweets']
-choices_list = choices.name.to_list()
-examples_list = choices.examples.to_list()
-for item in choices_list:
-    # print(f"{choices_list.index(item)}\t{item}")
-    s = str(choices_list.index(item)) + '\t' + item
-    t = examples_list[choices_list.index(item)]
-    # if there's an example, print it, otherwise ... don't
-    # below is the preferred way to do what you want to do
-    # cells without values still evaluated as NaN (like null),
-    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-    if pd.isnull(t) or t.isspace():
-        print(s)
-    else:
-        print(s + f' (e.g., {t})')
-print(f"{len(choices_list)}\tnone of the above/skip this category")
-i = input("Your selection: ")
-
-if int(i) < len(choices_list):
-    new_data = data.loc[data['name'] == choices_list[int(i)]]
-    print(f"You selected: {new_data.name}")
-    try:
-        selected_data = pd.concat([selected_data, new_data])
-    except NameError:
-        selected_data = new_data
-else:
-    print('OK, moving on.\n')
-print("\n---------------------------------------------------------\n")
+selected_data = input_choices("Finally, sweets:", 'sweets')
 
 print("Here is what you selected:")
 # print(selected_data['name']) //this line includes type and int64 info that's unneeded

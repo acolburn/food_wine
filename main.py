@@ -4,7 +4,6 @@
 # importing pandas package
 import pandas as pd
 
-
 # output will display all the rows and cols in the dataframe/spreadsheet
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -43,7 +42,6 @@ data.columns = [column.replace(" ", "_") for column in data.columns]
 # out = out.loc[data['bold_red'] >= 1]
 
 
-
 # display only name and examples columns
 # print(out[['name', 'examples']])
 
@@ -65,8 +63,6 @@ else:
     print('OK, moving on.\n')
 print("\n---------------------------------------------------------\n")
 
-
-
 # Ask about preparation
 print("Now let's consider how the meat, or main dish in the meal, will be prepared.")
 print("Which, if any of these preparation methods, are important to your meal:")
@@ -74,8 +70,18 @@ choices = data.loc[data['category'] == 'preparation']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item}")
-print(f"{len(choices_list)}\tNo meat today")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -88,9 +94,6 @@ if int(i) < len(choices_list):
 else:
     print('OK, moving on.\n')
 print("\n---------------------------------------------------------\n")
-
-
-
 
 # Ask about dairy
 print("Will your meal include dairy products?")
@@ -98,8 +101,18 @@ choices = data.loc[data['category'] == 'dairy']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tNope, no dairy.")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -112,7 +125,6 @@ if int(i) < len(choices_list):
 else:
     print('OK, moving on.\n')
 print("\n---------------------------------------------------------\n")
-
 
 # Ask about vegetables
 print("Now let us consider those healthy vegetables!")
@@ -120,8 +132,18 @@ choices = data.loc[data['category'] == 'vegetable']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tNo vegetables. Sorry, mom.")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -135,15 +157,24 @@ else:
     print('OK, moving on.\n')
 print("\n---------------------------------------------------------\n")
 
-
 # Ask about seasoning
 print("Seasoning is important for wine pairing. Are any of these part of your meal?")
 choices = data.loc[data['category'] == 'seasoning']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tNope, no seasoning. I like bland hospital food, too.")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -163,8 +194,18 @@ choices = data.loc[data['category'] == 'starch']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tNo starches today.")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -184,8 +225,18 @@ choices = data.loc[data['category'] == 'sweets']
 choices_list = choices.name.to_list()
 examples_list = choices.examples.to_list()
 for item in choices_list:
-    print(f"{choices_list.index(item)}\t{item} (e.g., {examples_list[choices_list.index(item)]})")
-print(f"{len(choices_list)}\tNo sweets. We are too full!")
+    # print(f"{choices_list.index(item)}\t{item}")
+    s = str(choices_list.index(item)) + '\t' + item
+    t = examples_list[choices_list.index(item)]
+    # if there's an example, print it, otherwise ... don't
+    # below is the preferred way to do what you want to do
+    # cells without values still evaluated as NaN (like null),
+    # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+    if pd.isnull(t) or t.isspace():
+        print(s)
+    else:
+        print(s + f' (e.g., {t})')
+print(f"{len(choices_list)}\tnone of the above/skip this category")
 i = input("Your selection: ")
 
 if int(i) < len(choices_list):
@@ -255,10 +306,7 @@ print(display.to_string())
 if len(out0) > 0:
     print("\nIn other words, for this meal, stay away from these wines:")
     for item in out0:
-        item=item.replace("_", ' ')
+        item = item.replace("_", ' ')
         print(item)
 
 print("\nDONE!")
-
-
-

@@ -21,7 +21,7 @@ vegetable,nightshades,tomato; eggplant; bell pepper,1,2,0,1,0,0,0,1,0
 vegetable,funghi,mushrooms; crimini; shitake,1,2,2,0,2,0,0,0,0
 vegetable,nuts and seeds,peanut; almond; pecan; sesame,0,0,1,1,1,1,1,2,0
 vegetable,beans and peas,lentil; navy; pinto; chickpea,0,1,0,1,0,2,1,0,0
-seasoning,black pepper, ,2,1,0,0,0,0,0,0,0
+seasoning,black pepper,,2,1,0,0,0,0,0,0,0
 seasoning,red pepper,ancho; chili; aleppo; chipotle,1,2,0,1,0,1,1,1,0
 seasoning,hot and spicy,hot sauce; habanero; sichuan,0,0,0,0,0,1,1,2,0
 seasoning,herbs,thyme; oregano; basil; tarragon,0,1,1,1,1,2,0,0,0
@@ -30,7 +30,7 @@ seasoning,exotic aromatic spices,anise; turmeric; saffron; fennel; ginger,0,2,1,
 starch,white starch,flour; white rice; pasta; bread; tortillas,1,1,1,1,1,1,1,1,1
 starch,whole wheat grains,quinoa; farro; brown rice,0,0,1,1,1,0,0,2,0
 starch,sweet starchy vegetables,sweet potato; yucca; taro,0,0,0,1,0,0,0,2,0
-starch,potato, ,1,1,1,1,1,1,1,1,0
+starch,potato,,1,1,1,1,1,1,1,1,0
 sweets,fruits and berries,strawberry; orange; apple; peach,0,0,0,0,0,0,1,2,1
 sweets,vanilla and caramel,ice cream; crème brulee,0,0,0,0,0,0,0,1,1
-sweets,chocolate and coffee, ,0,0,0,0,0,0,0,0,2
+sweets,chocolate and coffee,,0,0,0,0,0,0,0,0,2

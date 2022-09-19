@@ -19,6 +19,7 @@
 
 # importing pandas package
 import pandas as pd
+import wine_type_list
 
 # output will display all the rows and cols in the dataframe/spreadsheet
 pd.set_option('display.max_rows', None)
@@ -146,12 +147,21 @@ selected_data.columns = [column.replace("_", " ") for column in selected_data.co
 display = selected_data.sum(numeric_only=True).sort_values(ascending=False)
 # without .to_string() the info is displayed with an added Type:int64 attribute at the end
 # see https://stackoverflow.com/questions/53025207/how-do-i-remove-name-and-dtype-from-pandas-output
-print(display.to_string())
+print(display.to_string()+"\n\n")
 
-if len(out0) > 0:
-    print("\nIn other words, for this meal, stay away from these wines:")
-    for item in out0:
-        item = item.replace("_", ' ')
-        print(item)
+# display.index is a list of all the series's indexes, i.e., in this case, names of the wine categories
+top_pairing = display.index[0] # so this is the first wine name on the list, the top pair
+print("The best matching wine category for this meal is " + top_pairing.upper())
+s = ''
+the_list = wine_type_list.wine_types[top_pairing]
+for item in the_list:
+    if the_list.index(item) < len(the_list)-1:
+        s += item + ", "
+    else:
+        s += "and " + item
+print("Examples include " + s)
+
+
 
 print("\nDONE!")
+

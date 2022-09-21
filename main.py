@@ -28,7 +28,7 @@ def input_choices(prompt, category):
     _choices_list = _choices.name.to_list()
     # These are the examples that go with each choice; some choices don't have examples, e.g., 'potato'
     _examples_list = _choices.examples.to_list()
-    # This block takes each choice and prints it out as a number, the choice, and a examples (if present)
+    # This block takes each choice and prints it out as a number, the choice, and examples (if present)
     for _choice in _choices_list:
         # print(f"{choices_list.index(item)}\t{item}")
         s = str(_choices_list.index(_choice)) + '\t' + _choice
@@ -81,8 +81,8 @@ selected_data = input_choices("Which, if any, of these meats are part of your me
 
 # Ask about preparation
 selected_data = input_choices(
-    "Now let's consider how the meat, or main dish in the meal, will be prepared.\n" + ""
-                                                                                       "Which, if any of these preparation methods, are important to your meal:",
+    "Now let's consider how the meat, or main dish in the meal, will be prepared.\n" +
+    "Which, if any of these preparation methods, are important to your meal:",
     "preparation")
 
 # Ask about dairy
@@ -148,7 +148,7 @@ display = selected_data.sum(numeric_only=True).sort_values(ascending=False)
 # see https://stackoverflow.com/questions/53025207/how-do-i-remove-name-and-dtype-from-pandas-output
 print(display.to_string() + "\n\n")
 
-# display.index is a list of all the series's indexes, i.e., in this case, names of the wine categories
+# display.index is a list of all the series' indexes, i.e., in this case, names of the wine categories
 top_pairing = display.index[0]  # so this is the first wine name on the list, the top pair
 print("The best matching wine category for this meal is " + top_pairing.upper())
 s = ''
@@ -161,4 +161,3 @@ for item in the_list:
 print("Examples include " + s)
 
 print("\nDONE!")
-

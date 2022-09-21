@@ -1,22 +1,6 @@
 # Original pairing chart at https://tinyurl.com/ydx4twpy
 # data.query() info at https://www.geeksforgeeks.org/python-filtering-data-with-pandas-query-method/
 
-# how to select first 3 rows
-# out = data.head(3)
-
-# filtering with query method
-# if user selects pairing with meat:
-# out = data.loc[data['category'] == 'meat']
-
-# user selects pairing with red meat
-# filtered_data = data.loc[data['name'] == 'red meat']
-
-# how to select rows that contain value 2 in any column
-# out = out[out.isin([2]).any(axis=1)]
-
-# display only name and examples columns
-# print(out[['name', 'examples']])
-
 # importing pandas package
 import pandas as pd
 import wine_type_list
@@ -38,38 +22,58 @@ print("Let's pair! Follow the prompts to find wines to pair with your meal.\n")
 def input_choices(prompt, category):
     # global selected_data
     print(prompt)
+    # The choices for a given category, e.g., for category 'preparation' there's grilled, poached, etc.
     _choices = data.loc[data['category'] == category]
+    # Convert choices into a [list]
     _choices_list = _choices.name.to_list()
+    # These are the examples that go with each choice; some choices don't have examples, e.g., 'potato'
     _examples_list = _choices.examples.to_list()
-    for item in _choices_list:
+    # This block takes each choice and prints it out as a number, the choice, and a examples (if present)
+    for _choice in _choices_list:
         # print(f"{choices_list.index(item)}\t{item}")
-        s = str(_choices_list.index(item)) + '\t' + item
-        t = _examples_list[_choices_list.index(item)]
+        s = str(_choices_list.index(_choice)) + '\t' + _choice
+        t = _examples_list[_choices_list.index(_choice)]
         # if there's an example, print it, otherwise ... don't
         # below is the preferred way to do what you want to do
-        # cells without values still evaluated as NaN (like null),
+        # cells without values can be evaluated as NaN (like null),
         # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
         if pd.isnull(t) or t.isspace():
             print(s)
         else:
             print(s + f' (e.g., {t})')
     print(f"{len(_choices_list)}\tnone of the above/skip this category")
+    # User selects from the displayed list
     i = input("Your selection: ")
+    # If user selects something other than 'none of the above,' the number the selected will be < len(_choices_list)
     if int(i) < len(_choices_list):
+        # Get the row user just selected
         _new_data = data.loc[data['name'] == _choices_list[int(i)]]
+        # Confirm their selection
         print(f"You selected: {_new_data.name}")
+        # Add the row they selected to the other rows they selected already
         try:
             _selected_data = pd.concat([selected_data, _new_data])
-        except NameError:  # Get this error if there's nothing in the global selected_data
+        except NameError:  # Get this error if there's nothing in the global selected_data,
+            # i.e., it's their first selection. That's when we create the _selected_data df
             _selected_data = _new_data
     else:
         print('OK, moving on.\n')
+        # If user selected 'none of the above', we will just return selected_data df unchanged
         try:
             _selected_data = selected_data
-        except NameError:  # Get this error if selected_data is undefined, i.e., choose 'none' for first category
+        except NameError:  # Get this error if selected_data is undefined, i.e., user chose 'none' for first category
             return None
     print("\n---------------------------------------------------------\n")
     return _selected_data
+
+
+def display_selections():
+    print("Here is what you selected:")
+    # print(selected_data['name']) //this line includes type and int64 info; that's unneeded
+    selections = selected_data['name'].values
+    for selection in selections:
+        print(selection)
+    print("\n---------------------------------------------------------\n")
 
 
 # Ask about meats
@@ -77,7 +81,8 @@ selected_data = input_choices("Which, if any, of these meats are part of your me
 
 # Ask about preparation
 selected_data = input_choices(
-    "Now let's consider how the meat, or main dish in the meal, will be prepared.\nWhich, if any of these preparation methods, are important to your meal:",
+    "Now let's consider how the meat, or main dish in the meal, will be prepared.\n" + ""
+                                                                                       "Which, if any of these preparation methods, are important to your meal:",
     "preparation")
 
 # Ask about dairy
@@ -96,13 +101,7 @@ selected_data = input_choices("Are starches playing a role in your meal?", 'star
 # Ask about sweets
 selected_data = input_choices("Finally, sweets:", 'sweets')
 
-print("Here is what you selected:")
-# print(selected_data['name']) //this line includes type and int64 info that's unneeded
-sel = selected_data['name'].values
-for item in sel:
-    print(item)
-
-print("\n---------------------------------------------------------\n")
+display_selections()
 
 # Let's start parsing the selected_data dataframe:
 # select cols that contain 2's everywhere
@@ -147,21 +146,19 @@ selected_data.columns = [column.replace("_", " ") for column in selected_data.co
 display = selected_data.sum(numeric_only=True).sort_values(ascending=False)
 # without .to_string() the info is displayed with an added Type:int64 attribute at the end
 # see https://stackoverflow.com/questions/53025207/how-do-i-remove-name-and-dtype-from-pandas-output
-print(display.to_string()+"\n\n")
+print(display.to_string() + "\n\n")
 
 # display.index is a list of all the series's indexes, i.e., in this case, names of the wine categories
-top_pairing = display.index[0] # so this is the first wine name on the list, the top pair
+top_pairing = display.index[0]  # so this is the first wine name on the list, the top pair
 print("The best matching wine category for this meal is " + top_pairing.upper())
 s = ''
 the_list = wine_type_list.wine_types[top_pairing]
 for item in the_list:
-    if the_list.index(item) < len(the_list)-1:
+    if the_list.index(item) < len(the_list) - 1:
         s += item + ", "
     else:
         s += "and " + item
 print("Examples include " + s)
-
-
 
 print("\nDONE!")
 

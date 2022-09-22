@@ -15,12 +15,13 @@ data = pd.read_csv("food_wine_pairing.csv", encoding='unicode_escape')
 # replacing blank spaces with '_'
 data.columns = [column.replace(" ", "_") for column in data.columns]
 
+selected_data = pd.DataFrame() # initialize empty DataFrame
+
 # Introduction text
 print("Let's pair! Follow the prompts to find wines to pair with your meal.\n")
 
 
 def input_choices(prompt, category):
-    # global selected_data
     print(prompt)
     # The choices for a given category, e.g., for category 'preparation' there's grilled, poached, etc.
     _choices = data.loc[data['category'] == category]
@@ -28,42 +29,59 @@ def input_choices(prompt, category):
     _choices_list = _choices.name.to_list()
     # These are the examples that go with each choice; some choices don't have examples, e.g., 'potato'
     _examples_list = _choices.examples.to_list()
-    # This block takes each choice and prints it out as a number, the choice, and examples (if present)
-    for _choice in _choices_list:
-        # print(f"{choices_list.index(item)}\t{item}")
-        s = str(_choices_list.index(_choice)) + '\t' + _choice
-        t = _examples_list[_choices_list.index(_choice)]
-        # if there's an example, print it, otherwise ... don't
-        # below is the preferred way to do what you want to do
-        # cells without values can be evaluated as NaN (like null),
-        # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
-        if pd.isnull(t) or t.isspace():
-            print(s)
+    _selected_data = pd.DataFrame() # initialize empty dataframe, make it accessible everywhere in method
+    keep_choosing = True
+
+    while keep_choosing:
+        # This block takes each choice and prints it out as a number, the choice, and examples (if present)
+        for _choice in _choices_list:
+            # print(f"{choices_list.index(item)}\t{item}")
+            s = str(_choices_list.index(_choice)) + '\t' + _choice
+            t = _examples_list[_choices_list.index(_choice)]
+            # if there's an example, print it, otherwise ... don't
+            # below is the preferred way to do what you want to do
+            # cells without values can be evaluated as NaN (like null),
+            # also, there's the issue of cells that are blank but still have a space, tab, or other invisible character
+            if pd.isnull(t) or t.isspace():
+                print(s)
+            else:
+                print(s + f' (e.g., {t})')
+        print(f"{len(_choices_list)}\tnone of the above/skip this category")
+        # User selects from the displayed list
+        i = input("Your selection: ")
+        # If user selects something other than 'none of the above,' the number the selected will be < len(_choices_list)
+        if int(i) < len(_choices_list):
+            # Get the row user just selected
+            _new_data = data.loc[data['name'] == _choices_list[int(i)]]
+            # Confirm their selection
+            print(f"You selected: {_new_data['name'].values[0]}")
+            # Add the row they selected (_new_data) to the other rows they selected already in the category
+            _selected_data = pd.concat([_selected_data, _new_data])
+
+            # try:
+            #     _selected_data = pd.concat([_selected_data, _new_data])
+            # except NameError:  # Get this error if there's nothing in the global selected_data,
+            #     i.e., it's their first selection. That's when we create the _selected_data df
+                # _selected_data = _new_data
+            _choice = input("Anything else from this category's list (y/n)?")
+            if _choice == 'n':
+                keep_choosing = False
         else:
-            print(s + f' (e.g., {t})')
-    print(f"{len(_choices_list)}\tnone of the above/skip this category")
-    # User selects from the displayed list
-    i = input("Your selection: ")
-    # If user selects something other than 'none of the above,' the number the selected will be < len(_choices_list)
-    if int(i) < len(_choices_list):
-        # Get the row user just selected
-        _new_data = data.loc[data['name'] == _choices_list[int(i)]]
-        # Confirm their selection
-        print(f"You selected: {_new_data.name}")
-        # Add the row they selected to the other rows they selected already
-        try:
-            _selected_data = pd.concat([selected_data, _new_data])
-        except NameError:  # Get this error if there's nothing in the global selected_data,
-            # i.e., it's their first selection. That's when we create the _selected_data df
-            _selected_data = _new_data
-    else:
-        print('OK, moving on.\n')
-        # If user selected 'none of the above', we will just return selected_data df unchanged
-        try:
-            _selected_data = selected_data
-        except NameError:  # Get this error if selected_data is undefined, i.e., user chose 'none' for first category
-            return None
+            # Getting here means user selected 'none of the above',
+            # we will just return selected_data df unchanged
+            # try:
+            #     _selected_data = selected_data
+            # except NameError:
+            #     return None
+            keep_choosing = False
+
+    print('OK, moving on.\n')
     print("\n---------------------------------------------------------\n")
+    try:
+        _selected_data = pd.concat([selected_data, _selected_data])
+    except NameError: # Get this error if selected_data is undefined, i.e., user chose 'none' for first category
+        # return _selected_data
+        pass  # just going to return _selected_data in this case, anyway
     return _selected_data
 
 
